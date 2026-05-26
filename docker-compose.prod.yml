@@ -1,0 +1,12 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: production
+    image: ${COMPOSE_PROJECT_NAME}-frontend:prod
+    ports:
+      - "80:80"
+
+# Chạy production:
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build

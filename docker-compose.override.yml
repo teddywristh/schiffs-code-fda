@@ -1,0 +1,22 @@
+services:
+  backend:
+    volumes:
+      - ./backend:/app
+      - .:/workspace
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: builder
+    working_dir: /app
+    env_file:
+      - .env
+    ports:
+      - "${HOST_PORT_FRONTEND:-3000}:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - .:/workspace
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
