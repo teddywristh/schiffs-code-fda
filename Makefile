@@ -7,7 +7,7 @@ COMPOSE_PROD = $(COMPOSE_BASE) -f docker-compose.prod.yml
 .PHONY: dev dev-down dev-refresh prod prod-down logs-dev logs-prod logs-backend logs-frontend logs-db ps clean
 
 # ==========================================
-# MÔI TRƯỜNG DEV (LÚC CODE)
+# MÔI TRƯỜNG DEV
 # ==========================================
 
 dev:
@@ -21,7 +21,7 @@ dev-refresh:
 	$(COMPOSE_DEV) up -d --build --force-recreate --remove-orphans
 
 # ==========================================
-# MÔI TRƯỜNG PROD (LÚC LÊN SERVER)
+# MÔI TRƯỜNG PROD
 # ==========================================
 
 prod:
