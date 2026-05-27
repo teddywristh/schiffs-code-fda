@@ -19,7 +19,7 @@ app.add_exception_handler(CustomAppException, global_app_exception_handler)
 
 @app.get("/")
 def read_root():
-    return {"message": "hello world"}
+    return {"success": "Welcome to Schiffs Code FDA API!"}
 
 @app.get("/health", tags=["Health"])
 async def health_check(db: AsyncSession = Depends(get_db)):
@@ -34,4 +34,4 @@ async def health_check(db: AsyncSession = Depends(get_db)):
         }
     except Exception as e:
         logger.error(f"Lỗi kết nối tới Database: {str(e)}")
-        DisconnectedDatabaseException()
+        raise DisconnectedDatabaseException()
