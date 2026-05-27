@@ -3,8 +3,8 @@ from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from app.core.config import settings
 
-# 1. Lấy chuỗi kết nối từ biến môi trường (Docker đã tự động truyền vào)
-DATABASE_URL = settings.DATABASE_URL
+# 1. Lấy chuỗi kết nối (Tự động thích ứng Docker hoặc Local)
+DATABASE_URL = settings.get_database_url
 
 # 2. Cấu hình Connection Pool tối ưu cho hiệu năng và độ ổn định
 engine = create_async_engine(

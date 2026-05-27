@@ -13,7 +13,7 @@ from alembic import context
 # access to the values within the .ini file in use.
 config = context.config
 
-db_url = settings.DATABASE_URL
+db_url = settings.get_database_url
 config.set_main_option("sqlalchemy.url", db_url)
 
 # Interpret the config file for Python logging.

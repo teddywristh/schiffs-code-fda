@@ -1,0 +1,46 @@
+{
+  "name": "Web Developer Environment",
+  "dockerComposeFile": ["../docker-compose.yml", "../docker-compose.override.yml"],
+  "service": "backend",
+  "workspaceFolder": "/workspace",
+  "runServices": ["db-postgre", "backend", "frontend"],
+  "shutdownAction": "stopCompose",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+      "version": "latest",
+      "enableNonRootDocker": "true",
+      "moby": "false"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.11",
+      "installTools": true
+    },
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true
+    }
+  },
+
+  // Chạy LẦN ĐẦU TIÊN khi tạo container: Tự tạo file .env nếu chưa có
+  "postCreateCommand": "if [ ! -f /workspace/.env ]; then cp /workspace/.env.example /workspace/.env; fi",
+
+  // CHẠY MỖI LẦN MỞ CONTAINER (Lần 2, lần 3...): Tự động quét và cài thư viện mới nếu file requirements/package có thay đổi
+  "postStartCommand": "pip install --user -r /workspace/backend/requirements.txt && cd /workspace/frontend && npm install",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "remoteUser": "vscode"
+}
