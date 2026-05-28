@@ -1,0 +1,10 @@
+services:
+  workspace:
+    image: mcr.microsoft.com/devcontainers/base:bullseye
+    volumes:
+      - .:/workspace:cached
+    command: sleep infinity
+    depends_on:
+      - db-postgre
+      - backend
+      - frontend
