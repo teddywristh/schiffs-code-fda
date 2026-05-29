@@ -17,7 +17,7 @@ app = FastAPI(title=settings.PROJECT_NAME,
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.add_exception_handler(CustomAppException, global_app_exception_handler)
 
-@app.get("/")
+@app.get("/", tags=["Root"])
 def read_root():
     return {"success": "Welcome to Schiffs Code FDA API!"}
 
