@@ -23,6 +23,10 @@ class UserNotFoundException(CustomAppException):
     status_code = status.HTTP_404_NOT_FOUND
     detail = "Không tìm thấy người dùng này."
 
+class NotDeveloperException(CustomAppException):
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = "Bạn không có quyền truy cập tài nguyên này."
+
 class DisconnectedDatabaseException(CustomAppException):
     status_code = status.HTTP_503_SERVICE_UNAVAILABLE
     detail = "Mất kết nối với Database."

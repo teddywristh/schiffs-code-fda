@@ -4,13 +4,14 @@ from typing import Optional
 
 class UserBase(BaseModel):
     email: EmailStr
-    is_active: Optional[bool] = True
 
 class UserCreate(UserBase):
     password: str
 
 class UserResponse(UserBase):
     id: int
+    is_active: Optional[bool] = True
+    is_developer: Optional[bool] = False
     created_at: datetime
     updated_at: Optional[datetime] = None
 

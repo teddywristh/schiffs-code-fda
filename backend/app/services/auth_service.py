@@ -15,8 +15,8 @@ class AuthService:
         if not user or not user.is_activate or not await verify_password(form_data.password, user.password_hashed):
             raise InvalidLoginException()
 
-        # 3. Khởi tạo mã Token通 (Access Token) cấp cho người dùng
-        access_token = create_access_token(subject=user.id)
+        # 3. Khởi tạo mã Token (Access Token) cấp cho người dùng
+        access_token = create_access_token(subject=user.id, is_developer=user.is_developer)
         return {
             "access_token": access_token, 
             "token_type": "bearer"

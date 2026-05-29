@@ -6,6 +6,10 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     API_V1_STR: str
 
+    # 2. Tài khoản Admin
+    ADMIN_USERNAME: str
+    ADMIN_PASSWORD: str
+
     # 2. Cấu hình Bảo mật (JWT)
     SECRET_KEY: str
     ALGORITHM: str

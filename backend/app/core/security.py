@@ -24,7 +24,7 @@ async def verify_password(input_password: str, hashed_password: str) -> bool:
     """
     return await asyncio.to_thread(pwd_context.verify, input_password, hashed_password)
 
-def create_access_token(subject: Union[str, Any]) -> str:
+def create_access_token(subject: Union[str, Any], is_developer: bool) -> str:
     """
     Hàm tạo token access cho jwt khi User đăng nhập thành công
     """
@@ -34,7 +34,8 @@ def create_access_token(subject: Union[str, Any]) -> str:
     # Gói thông tin và Payload
     to_encode = {
         "exp": expire,
-        "sub": str(subject)
+        "sub": str(subject),
+        "dev": is_developer
     }
 
     # Ký bảo mật và sinh chuỗi token JWT
