@@ -12,10 +12,11 @@ class CRUDUser(CRUDBase[User]):
         result = await db.execute(select(self.model).where(self.model.email == email))
         return result.scalars().first()
 
-    async def create(self, db: AsyncSession, *, obj_in: UserCreate, hashed_password: str) -> User:
+    async def create(self, db: AsyncSession, obj_in: UserCreate, hashed_password: str) -> User:
         """Tạo mới một người dùng vào Database"""
         db_obj = User(
             email=obj_in.email,
+            nickname=obj_in.nickname,
             password_hashed=hashed_password,
             is_activate=True
         )

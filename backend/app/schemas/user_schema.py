@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Optional
 
 class UserBase(BaseModel):
+    nickname: str
     email: EmailStr
 
 class UserCreate(UserBase):
