@@ -3,7 +3,7 @@
   "dockerComposeFile": ["../../docker-compose.yml", "../../docker-compose.override.yml"],
   "service": "backend",
   "workspaceFolder": "/app",
-  "runServices": ["db-postgre", "backend", "frontend"],
+  "runServices": ["db-postgre", "redis", "backend", "frontend"],
   "shutdownAction": "stopCompose",
   "overrideCommand": false,
   "remoteUser": "root",

@@ -24,6 +24,18 @@ class Settings(BaseSettings):
     # DATABASE_URL do Docker truyền vào, nếu không có sẽ tự ghép
     DATABASE_URL: Optional[str] = None
 
+    # 4. Cấu hình kết nối Redis
+    HOST_PORT_REDIS: str
+    REDIS_PASSWORD: Optional[str] = None
+    REDIS_URL: Optional[str] = None
+
+    @property
+    def get_redis_url(self) -> str:
+        if self.REDIS_URL:
+            return self.REDIS_URL
+        password_part = f":{self.REDIS_PASSWORD}@" if self.REDIS_PASSWORD else ""
+        return f"redis://{password_part}localhost:{self.HOST_PORT_REDIS}/0"
+
     @property
     def get_database_url(self) -> str:
         if self.DATABASE_URL:

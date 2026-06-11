@@ -18,3 +18,6 @@ bcrypt==4.0.1
 
 # File uploads
 python-multipart>=0.0.7
+
+# Redis client
+redis>=5.0.1

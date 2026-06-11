@@ -26,8 +26,11 @@ services:
       - "${HOST_PORT_BACKEND:-8000}:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db-postgre:5432/${POSTGRES_DB:-web_base}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-}@redis:6379/0
     depends_on:
       db-postgre:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
     command: uvicorn main:app --host 0.0.0.0 --port 8000
@@ -38,6 +41,20 @@ services:
       retries: 3
       start_period: 15s
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "${HOST_PORT_REDIS:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --requirepass "${REDIS_PASSWORD}"
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   frontend:
     depends_on:
       - backend
@@ -45,3 +62,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:

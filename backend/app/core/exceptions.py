@@ -31,6 +31,10 @@ class DisconnectedDatabaseException(CustomAppException):
     status_code = status.HTTP_503_SERVICE_UNAVAILABLE
     detail = "Mất kết nối với Database."
 
+class DisconnectedRedisException(CustomAppException):
+    status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+    detail = "Mất kết nối với Redis."
+
 async def global_app_exception_handler(request: Request, exc: CustomAppException):
     return JSONResponse(
         status_code=exc.status_code,

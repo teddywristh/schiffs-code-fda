@@ -7,7 +7,7 @@
   ],
   "service": "workspace",
   "workspaceFolder": "/workspace",
-  "runServices": ["db-postgre", "backend", "frontend", "workspace"],
+  "runServices": ["db-postgre", "redis", "backend", "frontend", "workspace"],
   "shutdownAction": "stopCompose",
   "remoteUser": "root",
   "features": {
