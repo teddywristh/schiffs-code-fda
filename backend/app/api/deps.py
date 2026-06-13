@@ -13,10 +13,11 @@ from app.core.logger import logger
 from app.core.exceptions import InvalidLoginException, NotDeveloperException
 from app.crud.user_crud import user_crud
 
-secret_key=settings.SECRET_KEY
-algorithm=settings.ALGORITHM
+secret_key = settings.SECRET_KEY
+algorithm = settings.ALGORITHM
 
-oauth_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/login")
+oauth_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+
 
 async def get_current_user(
         db: AsyncSession = Depends(get_db),
@@ -43,6 +44,7 @@ async def get_current_user(
         raise InvalidLoginException()
 
     return user
+
 
 async def get_current_developer(
         current_user: User = Depends(get_current_user)

@@ -35,6 +35,19 @@ class DisconnectedRedisException(CustomAppException):
     status_code = status.HTTP_503_SERVICE_UNAVAILABLE
     detail = "Mất kết nối với Redis."
 
+class OTPExpiredException(CustomAppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = "Mã OTP đã hết hạn hoặc không tồn tại."
+
+class InvalidOTPException(CustomAppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = "Mã OTP không chính xác."
+
+class OTPNotVerifiedException(CustomAppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = "Mã OTP chưa được xác thực hoặc đã hết hạn."
+
+
 async def global_app_exception_handler(request: Request, exc: CustomAppException):
     return JSONResponse(
         status_code=exc.status_code,
