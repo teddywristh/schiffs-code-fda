@@ -6,11 +6,12 @@ from pydantic import EmailStr
 from app.core.database import get_db
 from app.core.redis import get_redis
 from app.services.auth_service import auth_service
+from app.schemas.otp_schema import MsgResponse, OTPVerifyResponse
 
 router = APIRouter()
 
 
-@router.post("/send")
+@router.post("/send", response_model=MsgResponse)
 async def send_otp_email(
     email: EmailStr,
     reason: str = "verify-email",
@@ -21,7 +22,7 @@ async def send_otp_email(
     return await auth_service.send_otp_email(email=email, reason=reason, db=db, redis=redis)
 
 
-@router.post("/verify")
+@router.post("/verify", response_model=OTPVerifyResponse)
 async def verify_otp_email(
     email: EmailStr,
     otp: str,
@@ -30,3 +31,4 @@ async def verify_otp_email(
 ):
     """Xác nhận mã OTP đã gửi về email"""
     return await auth_service.verify_otp_email(email=email, reason=reason, otp=otp, redis=redis)
+

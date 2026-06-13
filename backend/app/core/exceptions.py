@@ -1,5 +1,8 @@
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
 
 class CustomAppException(Exception):
     status_code: int = status.HTTP_400_BAD_REQUEST
@@ -61,4 +64,33 @@ async def global_app_exception_handler(request: Request, exc: CustomAppException
                 "message": exc.detail
             }
         },
+    )
+
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errors = []
+    for err in exc.errors():
+        loc = " -> ".join(str(l) for l in err["loc"])
+        errors.append(f"{loc}: {err['msg']}")
+    message = "; ".join(errors)
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={
+            "success": False,
+            "error": {
+                "code": "ValidationError",
+                "message": message
+            }
+        }
+    )
+
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "error": {
+                "code": "HTTPException",
+                "message": exc.detail
+            }
+        }
     )

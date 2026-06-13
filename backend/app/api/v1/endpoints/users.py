@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -9,12 +9,18 @@ from app.models.user_model import User
 
 router = APIRouter()
 
-@router.post("/register", response_model=UserResponse)
-async def register_user(user_in: UserCreate, db: AsyncSession = Depends(get_db)):
-    # Đẩy toàn bộ trách nhiệm xử lý logic cho user_service
+@router.post("", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def register_user(
+    user_in: UserCreate, 
+    db: AsyncSession = Depends(get_db)
+):
+    """Đăng ký người dùng mới"""
     return await user_service.register_new_user(db, user_in=user_in)
 
+
 @router.get("/me", response_model=UserResponse)
-async def read_user_me(current_user: User = Depends(get_current_user)):
-    # Giữ nguyên luồng lấy thông tin cá nhân qua ngự lâm quân bảo mật
+async def read_user_me(
+    current_user: User = Depends(get_current_user)
+):
+    """Tài khoản cá nhân"""
     return current_user

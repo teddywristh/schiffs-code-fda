@@ -1,18 +1,25 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import Depends
 from admin import create_admin_user
 from contextlib import asynccontextmanager
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.core.config import settings
 from app.core.exceptions import DisconnectedDatabaseException, DisconnectedRedisException
-from app.core.exceptions import CustomAppException, global_app_exception_handler
+from app.core.exceptions import (
+    CustomAppException,
+    global_app_exception_handler,
+    validation_exception_handler,
+    http_exception_handler,
+)
 from app.core.logger import logger
 from app.core.database import AsyncSessionLocal, get_db
 from app.core.redis import redis_client, get_redis
 
 from app.api.v1.api import api_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,10 +45,13 @@ app = FastAPI(title=settings.PROJECT_NAME,
 
 app.include_router(api_router, prefix=settings.API_V1_STR)
 app.add_exception_handler(CustomAppException, global_app_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
 
 @app.get("/", tags=["Root"])
 def read_root():
     return {"success": "Welcome to Schiffs Code FDA API!"}
+
 
 @app.get("/health", tags=["Health"])
 async def health_check(
