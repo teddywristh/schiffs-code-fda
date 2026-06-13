@@ -47,6 +47,9 @@ class OTPNotVerifiedException(CustomAppException):
     status_code = status.HTTP_400_BAD_REQUEST
     detail = "Mã OTP chưa được xác thực hoặc đã hết hạn."
 
+class OTPOverInputException(CustomAppException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = "Mã OTP đã nhập vượt quá số lần cho phép. Vui lòng lấy mã mới"
 
 async def global_app_exception_handler(request: Request, exc: CustomAppException):
     return JSONResponse(
