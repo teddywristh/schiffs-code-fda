@@ -22,5 +22,5 @@ async def register_user(
 async def read_user_me(
     current_user: User = Depends(get_current_user)
 ):
-    """Tài khoản cá nhân"""
+    """Thông tin cá nhân"""
     return current_user
