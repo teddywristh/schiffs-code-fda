@@ -16,18 +16,16 @@ from app.core.exceptions import (
     OTPExpiredException,
     OTPOverInputException
 )
+from app.helper.otp import send_email
 
 class AuthService:
     async def authenticate_user(self, db: AsyncSession, form_data: OAuth2PasswordRequestForm) -> dict:
         """Nghiệp vụ xác thực thông tin đăng nhập và cấp Token"""
-        # 1. Tìm người dùng bằng Email thông qua CRUD
         user = await user_crud.get_by_email(db, email=form_data.username)
 
-        # 2. Kiểm tra sự tồn tại, trạng thái kích hoạt và đối chiếu mật khẩu băm
         if not user or not user.is_activate or not await verify_password(form_data.password, user.password_hashed):
             raise InvalidLoginException()
 
-        # 3. Khởi tạo mã Token (Access Token) cấp cho người dùng
         access_token = create_access_token(subject=user.id, is_developer=user.is_developer)
         return {
             "access_token": access_token, 
@@ -46,12 +44,10 @@ class AuthService:
                 raise UserNotFoundException()
 
         code = "".join(secrets.choice("0123456789") for _ in range(6))
-
-        print(f"[OTP DEV ONLY] Mã OTP cho {email} với {reason} là: {code}")
-
         payload = json.dumps({"code": code, "attempts": 0})
 
         await redis.set(f"otp:{reason}:{email}", payload, ex=300)
+        await send_email(email=email, otp=code)
 
         return {
             "status": "success",
@@ -92,5 +88,4 @@ class AuthService:
         }
 
 
-# Khởi tạo thực thể dùng chung
 auth_service = AuthService()

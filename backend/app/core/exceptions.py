@@ -54,6 +54,10 @@ class OTPOverInputException(CustomAppException):
     status_code = status.HTTP_400_BAD_REQUEST
     detail = "Mã OTP đã nhập vượt quá số lần cho phép. Vui lòng lấy mã mới"
 
+class EmailSendingException(CustomAppException):
+    status_code = 500
+    detail = "Không thể gửi email OTP. Vui lòng thử lại sau."
+
 async def global_app_exception_handler(request: Request, exc: CustomAppException):
     return JSONResponse(
         status_code=exc.status_code,
