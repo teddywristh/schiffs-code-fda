@@ -4,7 +4,7 @@ COMPOSE_DEV  = docker compose
 COMPOSE_PROD = $(COMPOSE_BASE) -f docker-compose.prod.yml
 
 # Bổ sung các lệnh logs lẻ vào danh sách .PHONY
-.PHONY: dev dev-down dev-refresh prod prod-down logs-dev logs-prod logs-backend logs-frontend logs-db ps clean db-migrate db-upgrade
+.PHONY: dev dev-down dev-refresh prod prod-down logs-dev logs-prod logs-backend logs-frontend logs-db ps clean db-migrate db-upgrade env-backend env-frontend env-all
 
 # ==========================================
 # MÔI TRƯỜNG DEV (LÚC CODE)
@@ -19,6 +19,18 @@ dev-down:
 dev-refresh:
 	$(COMPOSE_DEV) down --remove-orphans
 	$(COMPOSE_DEV) up -d --build --force-recreate --remove-orphans
+
+# Cập nhật cấu hình .env cho backend (recreate container backend)
+env-backend:
+	$(COMPOSE_DEV) up -d --force-recreate backend
+
+# Cập nhật cấu hình .env cho frontend (recreate container frontend)
+env-frontend:
+	$(COMPOSE_DEV) up -d --force-recreate frontend
+
+# Cập nhật cấu hình .env cho cả backend và frontend
+env-all:
+	$(COMPOSE_DEV) up -d --force-recreate backend frontend
 
 # ==========================================
 # MÔI TRƯỜNG PROD (LÚC LÊN SERVER)

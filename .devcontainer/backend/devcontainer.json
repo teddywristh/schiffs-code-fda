@@ -13,6 +13,14 @@
         "ms-python.python",
         "ms-python.vscode-pylance"
       ]
+    },
+    "antigravity": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.python-environments",
+        "meta.pyrefly"
+      ]
     }
   }
 }

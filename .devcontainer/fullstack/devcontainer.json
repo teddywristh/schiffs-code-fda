@@ -10,6 +10,9 @@
   "runServices": ["db-postgre", "redis", "backend", "frontend", "workspace"],
   "shutdownAction": "stopCompose",
   "remoteUser": "root",
+  "containerEnv": {
+    "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+  },
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
       "version": "latest",
@@ -31,6 +34,17 @@
       "extensions": [
         "ms-python.python",
         "ms-python.vscode-pylance",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-azuretools.vscode-docker"
+      ]
+    },
+    "antigravity": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.debugpy",
+        "ms-python.python-environments",
+        "meta.pyrefly",
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "ms-azuretools.vscode-docker"

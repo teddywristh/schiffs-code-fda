@@ -1,8 +1,8 @@
 services:
   backend:
     volumes:
-      - ./backend:/app
-      - .:/workspace
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/backend:/app
+      - ${LOCAL_WORKSPACE_FOLDER:-.}:/workspace
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 
   frontend:
@@ -16,7 +16,7 @@ services:
     ports:
       - "${HOST_PORT_FRONTEND:-3000}:3000"
     volumes:
-      - ./frontend:/app
+      - ${LOCAL_WORKSPACE_FOLDER:-.}/frontend:/app
       - /app/node_modules
-      - .:/workspace
+      - ${LOCAL_WORKSPACE_FOLDER:-.}:/workspace
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
