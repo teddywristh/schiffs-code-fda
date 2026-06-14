@@ -1,3 +1,5 @@
+import asyncio
+
 from app.core.logger import logger
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -9,19 +11,26 @@ from app.core.exceptions import (
 )
 
 class DeveloperService:
-    async def check_health(self, db: AsyncSession, redis: Redis):
-        """Nghiệp vụ kiểm tra sức khỏe của cơ sở dữ liệu"""
+    async def _check_db(self, db: AsyncSession):
         try:
             await db.execute(text("SELECT 1"))
         except Exception as e:
             logger.error(f"Đã mất kết nối với PostgreSQL: {e}")
             raise DisconnectedDatabaseException()
 
+    async def _check_redis(self, redis: Redis):
         try:
             await redis.ping()
         except Exception as e:
             logger.error(f"Đã mất kết nối với Redis: {e}")
             raise DisconnectedRedisException()
+
+    async def check_health(self, db: AsyncSession, redis: Redis) -> dict[str,str]:
+        """Nghiệp vụ kiểm tra sức khỏe hệ thống (PostgreSQL và Redis)"""
+        await asyncio.gather(
+            self._check_db(db),
+            self._check_redis(redis)
+        )
 
         return {
             "status": "success",
