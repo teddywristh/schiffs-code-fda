@@ -1,10 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.user_crud import user_crud
-from app.schemas.user_schema import UserCreate
+from app.schemas.user_schema import UserCreate, UserErrors
 from app.models.user_model import User
 from app.core.security import hash_password
-from app.core.exceptions import EmailAlreadyExistsException
 
 class UserService:
     async def register_new_user(self, db: AsyncSession, user_in: UserCreate) -> User:
@@ -12,7 +11,7 @@ class UserService:
         # 1. Kiểm tra Email trùng lặp qua tầng CRUD
         existing_user = await user_crud.get_by_email(db, email=user_in.email)
         if existing_user:
-            raise EmailAlreadyExistsException()
+            UserErrors.EMAIL_ALREADY_EXISTS.throw()
 
         # 2. Mã hóa mật khẩu bất đồng bộ (Giải phóng Event Loop)
         hashed_pwd = await hash_password(user_in.password)

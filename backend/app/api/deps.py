@@ -7,10 +7,9 @@ from sqlalchemy.future import select
 
 from app.core.database import get_db
 from app.models.user_model import User
-from app.schemas.token_schema import TokenData
+from app.schemas.token_schema import TokenData, AuthErrors
 from app.core.config import settings
 from app.core.logger import logger
-from app.core.exceptions import InvalidLoginException, NotDeveloperException
 from app.crud.user_crud import user_crud
 
 secret_key = settings.SECRET_KEY
@@ -31,17 +30,17 @@ async def get_current_user(
         user_id: str = payload.get("sub")
 
         if user_id is None:
-            raise InvalidLoginException()
+            AuthErrors.UNAUTHORIZED.throw()
 
         token_data = TokenData(user_id=user_id)
     except JWTError as e:
         logger.error(f"Lỗi kiểm tra JWT: {str(e)}")
-        raise InvalidLoginException()
+        AuthErrors.UNAUTHORIZED.throw()
 
     user = await user_crud.get(db, id=int(token_data.user_id))
 
     if user is None:
-        raise InvalidLoginException()
+        AuthErrors.UNAUTHORIZED.throw()
 
     return user
 
@@ -53,5 +52,5 @@ async def get_current_developer(
     Hàm xác thực danh tính của developer qua token
     """
     if not current_user.is_developer:
-        raise NotDeveloperException()
+        AuthErrors.NOT_DEVELOPER.throw()
     return current_user

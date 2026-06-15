@@ -10,6 +10,7 @@ from app.core.exceptions import (
     global_app_exception_handler,
     validation_exception_handler,
     http_exception_handler,
+    unhandled_exception_handler,
 )
 from app.core.logger import logger
 from app.core.database import AsyncSessionLocal
@@ -44,6 +45,7 @@ app.include_router(api_router, prefix=settings.API_V1_STR)
 app.add_exception_handler(CustomAppException, global_app_exception_handler)
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(Exception, unhandled_exception_handler)
 
 @app.get("/", tags=["Root"])
 def read_root():

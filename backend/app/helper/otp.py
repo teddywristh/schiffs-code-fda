@@ -4,9 +4,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from redis.asyncio import Redis
 
-from app.core.exceptions import OTPNotVerifiedException, EmailSendingException
 from app.core.config import settings
 from app.core.logger import logger
+from app.schemas.otp_schema import OTPErrors
 
 account = settings.ADMIN_USERNAME
 password = settings.EMAIL_PASSWORD
@@ -18,7 +18,7 @@ async def verify_action_token(email: str, reason: str, token: str, redis: Redis)
     saved_token = await redis.get(token_key)
 
     if not saved_token or saved_token.decode("utf-8") != token:
-        raise OTPNotVerifiedException(detail="Yêu cầu chưa được xác thực hoặc token đã hết hạn")
+        OTPErrors.OTP_EXPIRED.throw()
 
     await redis.delete(token_key)
 
@@ -160,10 +160,6 @@ def _send_email_sync(to_email: str, subject: str, html_content: str) -> None:
     sender_email = settings.ADMIN_USERNAME
     sender_password = settings.EMAIL_PASSWORD
 
-    if not sender_email or not sender_password:
-        logger.error("ADMIN_USERNAME hoặc EMAIL_PASSWORD chưa được cấu hình trong .env")
-        raise EmailSendingException(detail="Cấu hình hệ thống email chưa sẵn sàng.")
-
     message = MIMEMultipart("alternative")
     message["Subject"] = subject
     message["From"] = f"Schiffs Code FDA <{sender_email}>"
@@ -181,7 +177,7 @@ def _send_email_sync(to_email: str, subject: str, html_content: str) -> None:
         logger.info(f"Gửi mã OTP qua email đến {to_email} thành công.")
     except Exception as e:
         logger.error(f"Lỗi gửi email đến {to_email}: {e}", exc_info=True)
-        raise EmailSendingException(detail=f"Không thể gửi email OTP do sự cố kỹ thuật.")
+        OTPErrors.EMAIL_SEND_FAILED.throw()
 
 async def send_email(email: str, otp: str) -> None:
     """Hàm gửi mã OTP cho người dùng bất đồng bộ"""

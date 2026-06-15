@@ -1,5 +1,3 @@
-from pydantic_settings.sources.providers import secrets
-from app.core.exceptions import InvalidOTPException
 import json
 import secrets
 
@@ -9,13 +7,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.crud.user_crud import user_crud
 from app.core.security import verify_password, create_access_token
-from app.core.exceptions import (
-    InvalidLoginException,
-    UserNotFoundException,
-    EmailAlreadyExistsException,
-    OTPExpiredException,
-    OTPOverInputException
-)
+from app.schemas.token_schema import AuthErrors
+from app.schemas.user_schema import UserErrors
+from app.schemas.otp_schema import OTPErrors
 from app.helper.otp import send_email
 
 class AuthService:
@@ -24,7 +18,7 @@ class AuthService:
         user = await user_crud.get_by_email(db, email=form_data.username)
 
         if not user or not user.is_activate or not await verify_password(form_data.password, user.password_hashed):
-            raise InvalidLoginException()
+            AuthErrors.INVALID_LOGIN.throw()
 
         access_token = create_access_token(subject=user.id, is_developer=user.is_developer)
         return {
@@ -38,10 +32,10 @@ class AuthService:
 
         if reason == "verify-email":
             if existed_user:
-                raise EmailAlreadyExistsException()
+                UserErrors.EMAIL_ALREADY_EXISTS.throw()
         elif reason == "change-password":
             if not existed_user:
-                raise UserNotFoundException()
+                UserErrors.USER_NOT_FOUND.throw()
 
         code = "".join(secrets.choice("0123456789") for _ in range(6))
         payload = json.dumps({"code": code, "attempts": 0})
@@ -49,43 +43,34 @@ class AuthService:
         await redis.set(f"otp:{reason}:{email}", payload, ex=300)
         await send_email(email=email, otp=code)
 
-        return {
-            "status": "success",
-            "message": f"OTP đã được gửi tới {email}"
-        }
 
-
-    async def verify_otp_email(self, email: str, reason: str, otp: str, redis: Redis):
+    async def verify_otp_email(self, email: str, reason: str, otp: str, redis: Redis) -> str:
         """Nghiệp vụ xác minh mã OTP"""
         redis_key = f"otp:{reason}:{email}"
 
         otp_data = await redis.get(redis_key)
 
         if not otp_data:
-            raise OTPExpiredException()
+            OTPErrors.OTP_EXPIRED.throw()
 
         otp_data = json.loads(otp_data)
 
         if otp_data.get("attempts", 0) >= 5:
             await redis.delete(redis_key)
-            raise OTPOverInputException()
+            OTPErrors.OTP_LIMIT_EXCEEDED.throw()
 
         if otp_data["code"] != otp:
             otp_data["attempts"] = otp_data.get("attempts", 0) + 1
             remain = 5 - otp_data["attempts"]
             await redis.set(redis_key, json.dumps(otp_data), ex=300)
-            raise InvalidOTPException(detail=f"Mã OTP không chính xác.\n Bạn còn {remain} lần thử.")
+            OTPErrors.OTP_INVALID.throw(dynamic_message=f"Mã OTP không chính xác.\n Bạn còn {remain} lần thử.")
 
         verification_token = secrets.token_hex(16)
 
         await redis.set(f"verified-token:{reason}:{email}", verification_token, ex=300)
         await redis.delete(redis_key)
 
-        return {
-            "status": "success",
-            "message": "OTP verified successfully",
-            "verified_token": verification_token
-        }
+        return verification_token
 
 
 auth_service = AuthService()

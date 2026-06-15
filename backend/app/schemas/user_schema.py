@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import Optional
-
+from app.core.exceptions import ErrorDetail
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -20,3 +20,7 @@ class UserResponse(UserBase):
 
     class Config:
         from_attributes = True
+
+class UserErrors:
+    EMAIL_ALREADY_EXISTS = ErrorDetail("EMAIL_ALREADY_EXISTS", 400, "Email này đã tồn tại.")
+    USER_NOT_FOUND = ErrorDetail("USER_NOT_FOUND", 404, "Không tìm thấy người dùng này.")
