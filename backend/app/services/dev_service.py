@@ -13,14 +13,14 @@ class DeveloperService:
             await db.execute(text("SELECT 1"))
         except Exception as e:
             logger.error(f"Đã mất kết nối với PostgreSQL: {e}")
-            DevErrors.DATABASE_ERROR.throw()
+            raise DevErrors.DATABASE_ERROR.throw()
 
     async def _check_redis(self, redis: Redis):
         try:
             await redis.ping()
         except Exception as e:
             logger.error(f"Đã mất kết nối với Redis: {e}")
-            DevErrors.REDIS_ERROR.throw()
+            raise DevErrors.REDIS_ERROR.throw()
 
     async def check_health(self, db: AsyncSession, redis: Redis) -> None:
         """Nghiệp vụ kiểm tra sức khỏe hệ thống (PostgreSQL và Redis)"""

@@ -11,7 +11,7 @@ class UserService:
         # 1. Kiểm tra Email trùng lặp qua tầng CRUD
         existing_user = await user_crud.get_by_email(db, email=user_in.email)
         if existing_user:
-            UserErrors.EMAIL_ALREADY_EXISTS.throw()
+            raise UserErrors.EMAIL_ALREADY_EXISTS.throw()
 
         # 2. Mã hóa mật khẩu bất đồng bộ (Giải phóng Event Loop)
         hashed_pwd = await hash_password(user_in.password)

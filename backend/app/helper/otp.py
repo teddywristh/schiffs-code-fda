@@ -18,7 +18,7 @@ async def verify_action_token(email: str, reason: str, token: str, redis: Redis)
     saved_token = await redis.get(token_key)
 
     if not saved_token or saved_token.decode("utf-8") != token:
-        OTPErrors.OTP_EXPIRED.throw()
+        raise OTPErrors.OTP_EXPIRED.throw()
 
     await redis.delete(token_key)
 
@@ -177,7 +177,7 @@ def _send_email_sync(to_email: str, subject: str, html_content: str) -> None:
         logger.info(f"Gửi mã OTP qua email đến {to_email} thành công.")
     except Exception as e:
         logger.error(f"Lỗi gửi email đến {to_email}: {e}", exc_info=True)
-        OTPErrors.EMAIL_SEND_FAILED.throw()
+        raise OTPErrors.EMAIL_SEND_FAILED.throw()
 
 async def send_email(email: str, otp: str) -> None:
     """Hàm gửi mã OTP cho người dùng bất đồng bộ"""

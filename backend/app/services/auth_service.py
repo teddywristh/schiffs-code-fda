@@ -18,7 +18,7 @@ class AuthService:
         user = await user_crud.get_by_email(db, email=form_data.username)
 
         if not user or not user.is_activate or not await verify_password(form_data.password, user.password_hashed):
-            AuthErrors.INVALID_LOGIN.throw()
+            raise AuthErrors.INVALID_LOGIN.throw()
 
         access_token = create_access_token(subject=user.id, is_developer=user.is_developer)
         return {
@@ -32,10 +32,10 @@ class AuthService:
 
         if reason == "verify-email":
             if existed_user:
-                UserErrors.EMAIL_ALREADY_EXISTS.throw()
+                raise UserErrors.EMAIL_ALREADY_EXISTS.throw()
         elif reason == "change-password":
             if not existed_user:
-                UserErrors.USER_NOT_FOUND.throw()
+                raise UserErrors.USER_NOT_FOUND.throw()
 
         code = "".join(secrets.choice("0123456789") for _ in range(6))
         payload = json.dumps({"code": code, "attempts": 0})
@@ -51,19 +51,19 @@ class AuthService:
         otp_data = await redis.get(redis_key)
 
         if not otp_data:
-            OTPErrors.OTP_EXPIRED.throw()
+            raise OTPErrors.OTP_EXPIRED.throw()
 
         otp_data = json.loads(otp_data)
 
         if otp_data.get("attempts", 0) >= 5:
             await redis.delete(redis_key)
-            OTPErrors.OTP_LIMIT_EXCEEDED.throw()
+            raise OTPErrors.OTP_LIMIT_EXCEEDED.throw()
 
         if otp_data["code"] != otp:
             otp_data["attempts"] = otp_data.get("attempts", 0) + 1
             remain = 5 - otp_data["attempts"]
             await redis.set(redis_key, json.dumps(otp_data), ex=300)
-            OTPErrors.OTP_INVALID.throw(dynamic_message=f"Mã OTP không chính xác.\n Bạn còn {remain} lần thử.")
+            raise OTPErrors.OTP_INVALID.throw(dynamic_message=f"Mã OTP không chính xác.\n Bạn còn {remain} lần thử.")
 
         verification_token = secrets.token_hex(16)
 
