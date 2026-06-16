@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from redis.asyncio import Redis
 
 from app.schemas.dev_schema import DevErrors
+from app.crud.user_crud import user_crud
 
 class DeveloperService:
     async def _check_db(self, db: AsyncSession):
@@ -28,6 +29,14 @@ class DeveloperService:
             self._check_db(db),
             self._check_redis(redis)
         )
+    
+    async def set_admin(self, email: str, db: AsyncSession) -> None:
+        """Nghiệp vụ đặt tài khoản email thành admin"""
+        user_existed = await user_crud.get_by_email(db=db, email=email)
+        if not user_existed:
+            raise DevErrors.USER_NOT_FOUND.throw()
+        
+        await user_crud.set_admin(email=email, db=db)
     
 
 dev_service = DeveloperService()

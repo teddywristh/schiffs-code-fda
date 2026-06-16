@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from app.core.exceptions import ErrorDetail
 
 class UserBase(BaseModel):
@@ -13,10 +13,16 @@ class UserCreate(UserBase):
 class UserResponse(UserBase):
     id: int
     nickname: str
-    is_active: Optional[bool] = True
+    is_activate: Optional[bool] = True
     is_developer: Optional[bool] = False
-    created_at: datetime
-    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+class UserListResponse(BaseModel):
+    page: int
+    limit: int
+    items: List[UserResponse]
 
     class Config:
         from_attributes = True

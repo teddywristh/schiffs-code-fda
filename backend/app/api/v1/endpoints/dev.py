@@ -41,10 +41,12 @@ async def check_connect_db(
     await dev_service.check_health(db=db, redis=redis)
     return ApiResponse(message="Mọi thứ kết nối ổn định")
 
-@router.get("/set-admin", response_model=ApiResponse[None])
+@router.patch("/set-admin", response_model=ApiResponse[None])
 async def set_admin(
     email: EmailStr,
     dev: User = Depends(get_current_developer),
     db: AsyncSession = Depends(get_db)
 ):
+    """API Dev cấp quyền admin cho User"""
+    await dev_service.set_admin(email=email, db=db)
     return ApiResponse(message=f"Đã cập nhật admin cho email {email}")
