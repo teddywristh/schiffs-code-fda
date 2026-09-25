@@ -9,5 +9,4 @@ venv/
 .env
 *.log
 .pytest_cache/
-alembic.ini
 tests/
